@@ -29,7 +29,7 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder> {
     private Context mContext;
-    public List<Movies> moviesList = new RootMovies().getMoviesArrayList();
+    public List<Movies> moviesList;
     private itemClickListener newItemClickListener;
 
     public MovieAdapter(Context mContext, List<Movies> moviesList,itemClickListener newItemClickListener) {
@@ -39,7 +39,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
     }
 
     public interface itemClickListener{
-        void onItemClicked(String id, String title, String release_date,String overview,String vote_average,String poster_path);
+        void onItemClicked(String id, String title, String release_date,String overview,String vote_average,String poster_path,String db_poster_path);
     }
 
     @NonNull
@@ -109,13 +109,15 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
         @Override
         public void onClick(View view) {
            Movies movies = moviesList.get(getAdapterPosition());
-            final String id = movies.getId();
+            final String id = movies.getIdMovies();
             final String title = movies.getOriginal_title();
             final String release_date = movies.getRelease_date();
             final String overView = movies.getOverview();
             final String vote_Average = movies.getVote_average();
+            //poster path to insert in room Database
+            final String db_Poster_Path = movies.getPoster_path();
             final String poster_path = "http://image.tmdb.org/t/p/w342/"+movies.getPoster_path();
-           newItemClickListener.onItemClicked(id,title,release_date,overView,vote_Average,poster_path);
+           newItemClickListener.onItemClicked(id,title,release_date,overView,vote_Average,poster_path,db_Poster_Path);
 
         }
     }

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_DBPOSTER_PATH;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_IDD;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_OVERVIEW;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_POSTER_PATH;
@@ -26,6 +27,7 @@ public class MovieDetailActivity extends AppCompatActivity {
         if(intent.hasExtra(EXTRA_IDD)){
 
             String id = intent.getStringExtra(EXTRA_IDD);
+            movieDetailFragment.setidMovies(id);
         }
         if(intent.hasExtra(EXTRA_OVERVIEW)){
             String overview = intent.getStringExtra(EXTRA_OVERVIEW);
@@ -38,6 +40,13 @@ public class MovieDetailActivity extends AppCompatActivity {
             movieDetailFragment.setPoster_path(poster_path);
 
         }
+
+        if(intent.hasExtra(EXTRA_DBPOSTER_PATH)){
+            String poster_path = intent.getStringExtra(EXTRA_DBPOSTER_PATH);
+            movieDetailFragment.setDbPoster_path(poster_path);
+
+        }
+
         if(intent.hasExtra(EXTRA_TITLEE)){
             String title = intent.getStringExtra(EXTRA_TITLEE);
             movieDetailFragment.setTitle(title);

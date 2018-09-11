@@ -5,6 +5,13 @@
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         app:showAsAction="never"
-        android:title="@string/settings" />
+        android:title="@string/sort_settings" />
+
+    <item
+        android:id="@+id/action_fav"
+        android:orderInCategory="100"
+        app:showAsAction="never"
+        android:title="My Favorites"
+        />
 
 </menu>

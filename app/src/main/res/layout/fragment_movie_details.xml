@@ -36,6 +36,14 @@
                 android:layout_gravity="center"
                 android:orientation="vertical">
 
+                <ImageView
+                    android:id="@+id/add_to_fav"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white"
+                    android:src="@drawable/ic_favorite_border_black_24dp"
+                    />
+
                 <TextView
                     android:id="@+id/release_date_details"
                     android:layout_width="wrap_content"

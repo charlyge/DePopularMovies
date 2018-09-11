@@ -1,6 +1,9 @@
 package com.charlyge.android.depopularmovies;
 
 
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,13 +19,18 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.charlyge.android.depopularmovies.Adapter.MovieAdapter;
 import com.charlyge.android.depopularmovies.Data.Constants;
+import com.charlyge.android.depopularmovies.Database.AppDatabase;
 import com.charlyge.android.depopularmovies.Retrofit.NetworkService;
 import com.charlyge.android.depopularmovies.model.Movies;
 import com.charlyge.android.depopularmovies.model.RootMovies;
@@ -34,6 +42,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
+import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_DBPOSTER_PATH;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_IDD;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_OVERVIEW;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_POSTER_PATH;
@@ -50,53 +59,104 @@ public class MovieGridFragment extends Fragment implements
     boolean mTwoPane;
     private RecyclerView recyclerView;
     private MovieAdapter movieAdapter;
+    AppDatabase appDatabase;
     private TextView errorTextView;
     private ProgressBar progressBar;
+    private int screenRotateOnFavselected=0;
     private boolean PREFERENCE_UPDATED = false;
     SharedPreferences sharedPreferences;
-    private static String MOVIE_ADAPTER_LIST = "movie Adapter List";
-    private ArrayList<Movies> moviesList = new RootMovies().getMoviesArrayList();
+    private List<Movies> moviesList;
+    DatabaseViewModel databaseViewModel;
+    NetworkViewModel networkViewModel;
+    private static final String SCREEN_ROTATE_KEY = "Screenkey";
+
     public MovieGridFragment(){}
 
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.settings, menu);
+    }
 
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList(MOVIE_ADAPTER_LIST,moviesList);
+        outState.putInt(SCREEN_ROTATE_KEY,screenRotateOnFavselected);
+
     }
 
-
     @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (savedInstanceState!=null){
-            moviesList = savedInstanceState.getParcelableArrayList(MOVIE_ADAPTER_LIST);
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_settings) {
+
+            Intent intent = new Intent(getActivity(), SettingsActivity.class);
+            startActivity(intent);
+        }
+        if(id==R.id.action_fav){
+            screenRotateOnFavselected=1;
+           databaseViewModel = ViewModelProviders.of(getActivity()).get(DatabaseViewModel.class);
+          //LiveData<List<Movies>> moviesList = databaseViewModel.getMovies();
+                databaseViewModel.getMovies().observe(getActivity(), new Observer<List<Movies>>() {
+                     @Override
+                     public void onChanged(@Nullable List<Movies> movies) {
+                         movieAdapter.setMovieData(movies);
+                         movieAdapter.notifyDataSetChanged();
+                     }
+                 });
+
 
         }
+        return super.onOptionsItemSelected(item);
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie_grid,container,false);
+        setHasOptionsMenu(true);
+
+        setUpSharedPreference();
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         if (rootView.findViewById(R.id.Details_activity) != null) {
             mTwoPane = true;
         } else {
             mTwoPane = false;
         }
+        if(savedInstanceState!=null){
+
+            screenRotateOnFavselected = savedInstanceState.getInt(SCREEN_ROTATE_KEY);
+        }
         recyclerView = rootView.findViewById(R.id.recycler_view);
         errorTextView = rootView.findViewById(R.id.error_view);
         progressBar = rootView.findViewById(R.id.loading_indicator);
         moviesList = new ArrayList<>();
+        appDatabase = AppDatabase.getAppDatabaseInstance(getActivity());
         movieAdapter = new MovieAdapter(getActivity(), moviesList, this);
-
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getActivity(), 2);
         recyclerView.setLayoutManager(gridLayoutManager);
         // recyclerView.addItemDecoration(new GridSpacingItemDecoration(2, 10, true));
         recyclerView.setItemAnimator(new DefaultItemAnimator());
         recyclerView.setAdapter(movieAdapter);
+        if(screenRotateOnFavselected==0){
             makeNetworkConnection();
+        }
+        else {
+            databaseViewModel = ViewModelProviders.of(getActivity()).get(DatabaseViewModel.class);
+            //LiveData<List<Movies>> moviesList = databaseViewModel.getMovies();
+            databaseViewModel.getMovies().observe(getActivity(), new Observer<List<Movies>>() {
+                @Override
+                public void onChanged(@Nullable List<Movies> movies) {
+                    movieAdapter.setMovieData(movies);
+                    movieAdapter.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE);
+                }
+            });
+
+        }
+
 
         return rootView;
     }
@@ -107,7 +167,7 @@ public class MovieGridFragment extends Fragment implements
     }
 
     @Override
-    public void onItemClicked(String id, String title, String release_date, String overview, String vote_average, String poster_path) {
+    public void onItemClicked(String id, String title, String release_date, String overview, String vote_average, String poster_path,String db_poster_path) {
         if (mTwoPane) {
             MovieDetailFragment movieDetailFragment = new MovieDetailFragment();
 
@@ -116,6 +176,8 @@ public class MovieGridFragment extends Fragment implements
                 movieDetailFragment.setTitle(title);
                 movieDetailFragment.setRelease_date(release_date);
                 movieDetailFragment.setUser_rating(vote_average);
+                movieDetailFragment.setidMovies(id);
+                movieDetailFragment.setDbPoster_path(db_poster_path);
 
             getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.movie_details_container,movieDetailFragment).commit();
 
@@ -127,47 +189,40 @@ public class MovieGridFragment extends Fragment implements
             intent.putExtra(EXTRA_POSTER_PATH, poster_path);
             intent.putExtra(EXTRA_RELEASE_DATE, release_date);
             intent.putExtra(EXTRA_TITLEE, title);
+            intent.putExtra(EXTRA_DBPOSTER_PATH,db_poster_path);
             startActivity(intent);
         }
     }
 
     private void makeNetworkConnection() {
-        ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
+            ConnectivityManager connectivityManager = (ConnectivityManager) getActivity().getSystemService(Context.CONNECTIVITY_SERVICE);
 
-        if (networkInfo != null && networkInfo.isConnected()) {
+            NetworkInfo networkInfo = connectivityManager.getActiveNetworkInfo();
 
-            String sort = setUpSharedPreference();
-            sharedPreferences.registerOnSharedPreferenceChangeListener(this);
-            String api_key = Constants.API_KEY;
-            NetworkService.getInstance().getJsonPlaceHolder().movielist(sort, api_key).enqueue(new Callback<RootMovies>() {
-                @Override
-                public void onResponse(Call<RootMovies> call, Response<RootMovies> response) {
-                    if (response.body() != null) {
-                        Log.i("ResponseBody", response.body().toString());
-                        moviesList = new RootMovies().getMoviesArrayList();
-                        moviesList = response.body().getMoviesArrayList();
-                        movieAdapter.setMovieData(moviesList);
-                        movieAdapter.notifyDataSetChanged();
-                        Log.i("MAINACTIVITY", "sucess" + response.body());
-                        progressBar.setVisibility(View.INVISIBLE);
-                    }
-                }
-
-                @Override
-                public void onFailure(Call<RootMovies> call, Throwable t) {
-                    Log.i("MAINACTIVITY", "MainActvityfail " + t.getMessage());
-                }
-            });
+            if (networkInfo != null && networkInfo.isConnected()) {
 
 
-        } else {
-            errorTextView.setVisibility(View.VISIBLE);
-            progressBar.setVisibility(View.GONE);
+
+                networkViewModel = ViewModelProviders.of(getActivity()).get(NetworkViewModel.class);
+               networkViewModel.getListLiveData().observe(getActivity(), new Observer<List<Movies>>() {
+                   @Override
+                   public void onChanged(@Nullable List<Movies> movies) {
+                       movieAdapter.setMovieData(movies);
+                       movieAdapter.notifyDataSetChanged();
+                       progressBar.setVisibility(View.GONE);
+                   }
+               });
+
+            } else {
+                errorTextView.setVisibility(View.VISIBLE);
+                progressBar.setVisibility(View.GONE);
+            }
         }
 
-    }
+
+
+
 
     @NonNull
     private String setUpSharedPreference() {
@@ -190,10 +245,22 @@ public class MovieGridFragment extends Fragment implements
     @Override
     public void onStart() {
         super.onStart();
+        Toast.makeText(getActivity(),"onStart",Toast.LENGTH_LONG).show();
+        Log.i("main", "onStart: preferences were updated" + PREFERENCE_UPDATED);
         if (PREFERENCE_UPDATED) {
             Log.d("main", "onStart: preferences were updated");
-            getActivity().recreate();
+            Toast.makeText(getActivity(),"preference updated",Toast.LENGTH_LONG).show();
+
+            Intent intent = getActivity().getIntent();
+
+            intent.addFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+            getActivity().finish();
+            getActivity().overridePendingTransition(0, 0);
+
+            startActivity(intent);
+            getActivity().overridePendingTransition(0, 0);
             PREFERENCE_UPDATED = false;
+            screenRotateOnFavselected=0;
         }
     }
 }

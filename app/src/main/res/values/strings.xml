@@ -1,12 +1,14 @@
 <resources>
     <string name="app_name">DePopularMovies</string>
     <string name="an_error_occurred_enable_internet_and_retry">An Error Occurred Enable Internet and Retry</string>
-    <string name="settings">Settings</string>
+    <string name="sort_settings">Sort Settings</string>
     <string name="sortby">Sort By</string>
     <string name="popular_label" >Popular</string>
     <string name="top_rated_label">TopRated</string>
     <string name="listkey" translatable="false">List_key</string>
     <string name="sort_default" translatable="false">popular</string>
     <string name="top_rated" translatable="false">top_rated</string>
+    <string name="fav_label" translatable="false">Favourites</string>
+    <string name="favourite_val" translatable="false">Favourites</string>
     <string name="play">Play</string>
 </resources>
