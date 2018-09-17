@@ -1,4 +1,4 @@
-package com.charlyge.android.depopularmovies;
+package com.charlyge.android.depopularmovies.ViewModels;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;
@@ -8,15 +8,16 @@ import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 
 import com.charlyge.android.depopularmovies.Data.Constants;
+import com.charlyge.android.depopularmovies.R;
 import com.charlyge.android.depopularmovies.Retrofit.NetworkService;
 import com.charlyge.android.depopularmovies.model.Movies;
 
 import java.util.List;
 
-public class NetworkViewModel extends AndroidViewModel {
+public class MoviesViewModel extends AndroidViewModel {
 
 public LiveData<List<Movies>> listLiveData;
-    public NetworkViewModel(@NonNull Application application) {
+    public MoviesViewModel(@NonNull Application application) {
         super(application);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication());
 

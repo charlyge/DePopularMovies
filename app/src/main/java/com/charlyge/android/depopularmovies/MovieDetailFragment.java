@@ -1,9 +1,19 @@
 package com.charlyge.android.depopularmovies;
 
+import android.arch.lifecycle.Observer;
+import android.arch.lifecycle.ViewModelProviders;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,8 +22,18 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.charlyge.android.depopularmovies.Adapter.ReviewAdapter;
+import com.charlyge.android.depopularmovies.Adapter.TrailerAdapter;
+import com.charlyge.android.depopularmovies.Data.Constants;
 import com.charlyge.android.depopularmovies.Database.AppDatabase;
+import com.charlyge.android.depopularmovies.Retrofit.NetworkService;
+import com.charlyge.android.depopularmovies.ViewModels.ReviewViewModel;
+import com.charlyge.android.depopularmovies.ViewModels.ReviewViewModelFactory;
+import com.charlyge.android.depopularmovies.ViewModels.TrailerViewModel;
+import com.charlyge.android.depopularmovies.ViewModels.TrailerViewModelFactory;
 import com.charlyge.android.depopularmovies.model.Movies;
+import com.charlyge.android.depopularmovies.model.Review;
+import com.charlyge.android.depopularmovies.model.Trailers;
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -22,7 +42,7 @@ import java.util.List;
  * Created by DELL PC on 8/15/2018.
  */
 
-public class MovieDetailFragment extends Fragment {
+public class MovieDetailFragment extends Fragment implements TrailerAdapter.TrailerItemClckListener {
     private String overview;
     private String title;
     private String release_date;
@@ -31,11 +51,18 @@ public class MovieDetailFragment extends Fragment {
     private String idMovies;
     private String db_poster_path;
     private AppDatabase appDatabase;
+    private String db_backDropImage;
+    private String backDropImage;
+    public void setDbBackdrop_Image(String db_backDropImage) {
+        this.db_backDropImage = db_backDropImage;
+    }
     public void setOverview(String overview) {
         this.overview = overview;
     }
 
-
+    public void setBackdrop_Image(String backDropImage) {
+        this.backDropImage = backDropImage;
+    }
 
     public void setPoster_path(String poster_path) {
         this.poster_path = poster_path;
@@ -72,6 +99,14 @@ public class MovieDetailFragment extends Fragment {
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
      View root = inflater.inflate(R.layout.fragment_movie_details,container,false);
       appDatabase = AppDatabase.getAppDatabaseInstance(getActivity());
+      NetworkService networkService = NetworkService.getOurInstance();
+
+
+        Toolbar toolbar = (Toolbar) root.findViewById(R.id.toolbar);
+        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
+
+        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) root.findViewById(R.id.collapsing_toolbar);
+        collapsingToolbarLayout.setTitle(title);
        TextView overviewTv = root.findViewById(R.id.overview);
 
 
@@ -94,14 +129,19 @@ public class MovieDetailFragment extends Fragment {
                 }
             }
         });
-        //Loads movie by Id
+        //Setup RecyclerView for Reviews
+
+
+
+
 
 
 
         TextView  release_date_Tv = root.findViewById(R.id.release_date_details);
         ImageView poster_path_Iv = root.findViewById(R.id.poster_path_details);
         TextView user_rating_Tv = root.findViewById(R.id.user_rating);
-
+       // ImageView backDropImageView = root.findViewById(R.id.backDropImage);
+       // Picasso.get().load(backDropImage).placeholder(getResources().getDrawable(R.drawable.ic_launcher_background)).into(backDropImageView);
         addToFav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -124,7 +164,7 @@ public class MovieDetailFragment extends Fragment {
                         }
 
                         else {
-                            Movies movieEntry = new Movies(idMovies,user_rating,db_poster_path,title,overview,release_date);
+                            Movies movieEntry = new Movies(idMovies,user_rating,db_poster_path,title,overview,release_date,db_backDropImage);
                             appDatabase.movieDao().insertMovies(movieEntry);
                             getActivity().runOnUiThread(new Runnable() {
                                 @Override
@@ -149,6 +189,57 @@ public class MovieDetailFragment extends Fragment {
         Picasso.get().load(poster_path).placeholder(R.drawable.ic_image_black_24dp).into(poster_path_Iv);
 
 
+        //Setup Review RecyclerView Network Connection for Reviews
+        final RecyclerView reviewRv = root.findViewById(R.id.recycler_view_reviews);
+        LinearLayoutManager linearLayoutManagerRv = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+        reviewRv.setLayoutManager(linearLayoutManagerRv);
+        reviewRv.setHasFixedSize(true);
+        ((DefaultItemAnimator) reviewRv.getItemAnimator()).setSupportsChangeAnimations(false);
+        reviewRv.setNestedScrollingEnabled(false);
+
+        ReviewViewModelFactory reviewViewModelFactory = new ReviewViewModelFactory(networkService,idMovies, Constants.API_KEY);
+        ReviewViewModel reviewViewModel = ViewModelProviders.of(getActivity(),reviewViewModelFactory)
+                .get(ReviewViewModel.class);
+        reviewViewModel.getListLiveData().observe(getActivity(), new Observer<List<Review>>() {
+            @Override
+            public void onChanged(@Nullable List<Review> reviews) {
+                Log.i("Review","Started Review call");
+                final ReviewAdapter reviewAdapter = new ReviewAdapter(reviews);
+                reviewRv.setAdapter(reviewAdapter);
+            }
+        });
+
+        //NetworkConnection for Trailers
+        //Setup RecyclerView For Trailer
+        RecyclerView trailerRv = root.findViewById(R.id.recycler_view_trailer);
+
+        LinearLayoutManager linearLayoutManagerTr = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
+        trailerRv.setLayoutManager(linearLayoutManagerTr);
+        trailerRv.setNestedScrollingEnabled(false);
+        trailerRv.setHasFixedSize(true);
+        ((DefaultItemAnimator) trailerRv.getItemAnimator()).setSupportsChangeAnimations(false);
+        final TrailerAdapter trailerAdapter = new TrailerAdapter(this);
+        trailerRv.setAdapter(trailerAdapter);
+        TrailerViewModelFactory trailerViewModelFactory = new TrailerViewModelFactory(networkService,idMovies,Constants.API_KEY);
+        TrailerViewModel trailerViewModel = ViewModelProviders.of(getActivity(),trailerViewModelFactory).get(TrailerViewModel.class);
+        trailerViewModel.getTrailersList().observe(getActivity(), new Observer<List<Trailers>>() {
+            @Override
+            public void onChanged(@Nullable List<Trailers> trailers) {
+                Log.i("Trailer","Started Trailer call");
+              trailerAdapter.setTrailersList(trailers);
+
+            }
+        });
+
         return root;
     }
+
+    @Override
+    public void WatchTrailer(String VideoKey) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=" + VideoKey));
+        startActivity(intent);
+    }
+
+
+
 }

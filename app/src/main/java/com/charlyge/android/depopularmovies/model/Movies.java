@@ -24,6 +24,7 @@ public class Movies{
     private String original_title;
     private String overview;
     private String release_date;
+    private String backdrop_path;
 
     @Ignore
     public Movies(){
@@ -32,17 +33,18 @@ public class Movies{
     }
 
     @Ignore
-    public Movies(String idMovies,String vote_average,String poster_path,String original_title,String overview,String release_date){
+    public Movies(String idMovies,String vote_average,String poster_path,String original_title,String overview,String release_date,String backdrop_path){
         this.original_title=original_title;
         this.poster_path=poster_path;
         this.overview=overview;
         this.idMovies=idMovies;
         this.release_date=release_date;
         this.vote_average=vote_average;
+        this.backdrop_path = backdrop_path;
 
     }
 
-    public Movies(int idDatabase,String idMovies,String vote_average,String poster_path,String original_title,String overview,String release_date){
+    public Movies(int idDatabase,String idMovies,String vote_average,String poster_path,String original_title,String overview,String release_date,String backdrop_path){
         this.original_title=original_title;
         this.poster_path=poster_path;
         this.overview=overview;
@@ -50,9 +52,14 @@ public class Movies{
         this.vote_average=vote_average;
         this.idDatabase=idDatabase;
         this.idMovies = idMovies;
+        this.backdrop_path=backdrop_path;
 
     }
 
+
+    public String getBackdrop_path() {
+        return backdrop_path;
+    }
 
     public String getOriginal_title() {
         return original_title;

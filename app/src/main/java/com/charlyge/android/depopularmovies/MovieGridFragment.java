@@ -1,7 +1,6 @@
 package com.charlyge.android.depopularmovies;
 
 
-import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.Observer;
 import android.arch.lifecycle.ViewModelProviders;
 import android.content.Context;
@@ -29,19 +28,16 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.charlyge.android.depopularmovies.Adapter.MovieAdapter;
-import com.charlyge.android.depopularmovies.Data.Constants;
 import com.charlyge.android.depopularmovies.Database.AppDatabase;
-import com.charlyge.android.depopularmovies.Retrofit.NetworkService;
+import com.charlyge.android.depopularmovies.ViewModels.DatabaseViewModel;
+import com.charlyge.android.depopularmovies.ViewModels.MoviesViewModel;
 import com.charlyge.android.depopularmovies.model.Movies;
-import com.charlyge.android.depopularmovies.model.RootMovies;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
-
+import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_BACKDROP_IMAGE;
+import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_DBBACKDROP_IMAGE;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_DBPOSTER_PATH;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_IDD;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_OVERVIEW;
@@ -67,7 +63,8 @@ public class MovieGridFragment extends Fragment implements
     SharedPreferences sharedPreferences;
     private List<Movies> moviesList;
     DatabaseViewModel databaseViewModel;
-    NetworkViewModel networkViewModel;
+    MoviesViewModel moviesViewModel;
+
     private static final String SCREEN_ROTATE_KEY = "Screenkey";
 
     public MovieGridFragment(){}
@@ -117,7 +114,6 @@ public class MovieGridFragment extends Fragment implements
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_movie_grid,container,false);
         setHasOptionsMenu(true);
-
         setUpSharedPreference();
         sharedPreferences.registerOnSharedPreferenceChangeListener(this);
         if (rootView.findViewById(R.id.Details_activity) != null) {
@@ -166,33 +162,7 @@ public class MovieGridFragment extends Fragment implements
         PREFERENCE_UPDATED = true;
     }
 
-    @Override
-    public void onItemClicked(String id, String title, String release_date, String overview, String vote_average, String poster_path,String db_poster_path) {
-        if (mTwoPane) {
-            MovieDetailFragment movieDetailFragment = new MovieDetailFragment();
 
-                movieDetailFragment.setOverview(overview);
-                movieDetailFragment.setPoster_path(poster_path);
-                movieDetailFragment.setTitle(title);
-                movieDetailFragment.setRelease_date(release_date);
-                movieDetailFragment.setUser_rating(vote_average);
-                movieDetailFragment.setidMovies(id);
-                movieDetailFragment.setDbPoster_path(db_poster_path);
-
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.movie_details_container,movieDetailFragment).commit();
-
-        } else {
-            Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
-            intent.putExtra(EXTRA_IDD, id);
-            intent.putExtra(EXTRA_OVERVIEW, overview);
-            intent.putExtra(EXTRA_VOTE_AVERAGE, vote_average);
-            intent.putExtra(EXTRA_POSTER_PATH, poster_path);
-            intent.putExtra(EXTRA_RELEASE_DATE, release_date);
-            intent.putExtra(EXTRA_TITLEE, title);
-            intent.putExtra(EXTRA_DBPOSTER_PATH,db_poster_path);
-            startActivity(intent);
-        }
-    }
 
     private void makeNetworkConnection() {
 
@@ -204,8 +174,8 @@ public class MovieGridFragment extends Fragment implements
 
 
 
-                networkViewModel = ViewModelProviders.of(getActivity()).get(NetworkViewModel.class);
-               networkViewModel.getListLiveData().observe(getActivity(), new Observer<List<Movies>>() {
+                moviesViewModel = ViewModelProviders.of(getActivity()).get(MoviesViewModel.class);
+               moviesViewModel.getListLiveData().observe(getActivity(), new Observer<List<Movies>>() {
                    @Override
                    public void onChanged(@Nullable List<Movies> movies) {
                        movieAdapter.setMovieData(movies);
@@ -245,11 +215,9 @@ public class MovieGridFragment extends Fragment implements
     @Override
     public void onStart() {
         super.onStart();
-        Toast.makeText(getActivity(),"onStart",Toast.LENGTH_LONG).show();
         Log.i("main", "onStart: preferences were updated" + PREFERENCE_UPDATED);
         if (PREFERENCE_UPDATED) {
             Log.d("main", "onStart: preferences were updated");
-            Toast.makeText(getActivity(),"preference updated",Toast.LENGTH_LONG).show();
 
             Intent intent = getActivity().getIntent();
 
@@ -261,6 +229,37 @@ public class MovieGridFragment extends Fragment implements
             getActivity().overridePendingTransition(0, 0);
             PREFERENCE_UPDATED = false;
             screenRotateOnFavselected=0;
+        }
+    }
+
+    @Override
+    public void onItemClicked(String id, String title, String release_date, String overview, String vote_average, String poster_path, String db_poster_path, String backDropImage, String db_backDropImage) {
+        if (mTwoPane) {
+            MovieDetailFragment movieDetailFragment = new MovieDetailFragment();
+
+            movieDetailFragment.setOverview(overview);
+            movieDetailFragment.setPoster_path(poster_path);
+            movieDetailFragment.setTitle(title);
+            movieDetailFragment.setRelease_date(release_date);
+            movieDetailFragment.setUser_rating(vote_average);
+            movieDetailFragment.setidMovies(id);
+            movieDetailFragment.setDbPoster_path(db_poster_path);
+            movieDetailFragment.setDbBackdrop_Image(db_backDropImage);
+            movieDetailFragment.setBackdrop_Image(backDropImage);
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.movie_details_container,movieDetailFragment).commit();
+
+        } else {
+            Intent intent = new Intent(getActivity(), MovieDetailActivity.class);
+            intent.putExtra(EXTRA_IDD, id);
+            intent.putExtra(EXTRA_OVERVIEW, overview);
+            intent.putExtra(EXTRA_VOTE_AVERAGE, vote_average);
+            intent.putExtra(EXTRA_POSTER_PATH, poster_path);
+            intent.putExtra(EXTRA_RELEASE_DATE, release_date);
+            intent.putExtra(EXTRA_TITLEE, title);
+            intent.putExtra(EXTRA_DBPOSTER_PATH,db_poster_path);
+            intent.putExtra(EXTRA_DBBACKDROP_IMAGE,db_backDropImage);
+            intent.putExtra(EXTRA_BACKDROP_IMAGE,backDropImage);
+            startActivity(intent);
         }
     }
 }

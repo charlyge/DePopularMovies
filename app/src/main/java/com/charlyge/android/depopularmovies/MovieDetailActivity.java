@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
+import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_BACKDROP_IMAGE;
+import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_DBBACKDROP_IMAGE;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_DBPOSTER_PATH;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_IDD;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_OVERVIEW;
@@ -14,14 +16,21 @@ import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_VOTE_AVE
 
 
 public class MovieDetailActivity extends AppCompatActivity {
-
+    private MovieDetailFragment movieDetailFragment;
+    private final String FRAGMENT_TAG = "myfragmenttag";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
 
-        MovieDetailFragment movieDetailFragment = new MovieDetailFragment();
+        if(savedInstanceState!=null){
+      movieDetailFragment =(MovieDetailFragment)getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
+        }
+        else if(movieDetailFragment==null){
+            movieDetailFragment = new MovieDetailFragment();
+        }
+
 
         Intent intent = getIntent();
         if(intent.hasExtra(EXTRA_IDD)){
@@ -47,6 +56,19 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         }
 
+        if(intent.hasExtra(EXTRA_BACKDROP_IMAGE)){
+            String backDropImage = intent.getStringExtra(EXTRA_BACKDROP_IMAGE);
+            movieDetailFragment.setBackdrop_Image(backDropImage);
+
+        }
+
+        if(intent.hasExtra(EXTRA_DBBACKDROP_IMAGE)){
+            String dbBackDropImage = intent.getStringExtra(EXTRA_DBBACKDROP_IMAGE);
+            movieDetailFragment.setDbBackdrop_Image(dbBackDropImage);
+
+        }
+
+
         if(intent.hasExtra(EXTRA_TITLEE)){
             String title = intent.getStringExtra(EXTRA_TITLEE);
             movieDetailFragment.setTitle(title);
@@ -62,6 +84,10 @@ public class MovieDetailActivity extends AppCompatActivity {
             movieDetailFragment.setUser_rating(user_rating);
 
         }
-      getSupportFragmentManager().beginTransaction().add(R.id.movie_details_container,movieDetailFragment).commit();
+        if(!movieDetailFragment.isInLayout()){
+            getSupportFragmentManager().beginTransaction().replace(R.id.movie_details_container,movieDetailFragment,FRAGMENT_TAG).
+                    commit();
+        }
+
     }
 }

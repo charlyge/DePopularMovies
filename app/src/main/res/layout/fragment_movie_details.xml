@@ -1,8 +1,44 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.design.widget.CoordinatorLayout
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/cordinator_layout"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent">
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <android.support.design.widget.AppBarLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/app_bar_layout"
+        android:theme="@style/AppTheme.AppBarOverlay"
+        >
+        <android.support.design.widget.CollapsingToolbarLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:id="@+id/collapsing_toolbar"
+            app:layout_scrollFlags="exitUntilCollapsed"
+            >
+
+
+            <android.support.v7.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="?attr/actionBarSize"
+                app:layout_collapseMode="pin"
+                app:popupTheme="@style/AppTheme.PopupOverlay" />
+        </android.support.design.widget.CollapsingToolbarLayout>
+
+    </android.support.design.widget.AppBarLayout>
+
+
+    <android.support.v4.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="50dp"
+        >
+
+
 
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
@@ -11,17 +47,12 @@
         android:orientation="vertical"
         tools:context="com.charlyge.android.depopularmovies.MovieDetailActivity">
 
-        <TextView
-            android:id="@+id/detail_title"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="Title"
-            android:background="@android:color/holo_blue_light"
-            />
+
 
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
             android:orientation="horizontal">
 
             <ImageView
@@ -35,6 +66,15 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/detail_title"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    tools:text="Title"
+                    android:textStyle="bold"
+                    android:padding="10dp"
+                    />
 
                 <ImageView
                     android:id="@+id/add_to_fav"
@@ -72,5 +112,34 @@
             android:layout_width="match_parent"
             android:layout_height="3dp"
             android:background="#666ccc" />
+
+    <TextView
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:text="@string/movie_trailer"
+        android:textColor="@android:color/holo_red_dark"
+    />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_trailer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            />
+
+        <TextView
+            android:layout_height="wrap_content"
+            android:layout_width="wrap_content"
+            android:text="@string/reviews"
+            android:textColor="@android:color/holo_red_dark"
+            />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_reviews"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+
+            />
     </LinearLayout>
-</ScrollView>
+</android.support.v4.widget.NestedScrollView>
+    </android.support.design.widget.CoordinatorLayout>

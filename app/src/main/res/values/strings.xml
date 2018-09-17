@@ -11,4 +11,6 @@
     <string name="fav_label" translatable="false">Favourites</string>
     <string name="favourite_val" translatable="false">Favourites</string>
     <string name="play">Play</string>
+    <string name="movie_trailer">Movie Trailer</string>
+    <string name="reviews">Reviews</string>
 </resources>

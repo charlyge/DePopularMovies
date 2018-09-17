@@ -6,7 +6,11 @@ import android.util.Log;
 import android.view.View;
 
 import com.charlyge.android.depopularmovies.model.Movies;
+import com.charlyge.android.depopularmovies.model.Review;
 import com.charlyge.android.depopularmovies.model.RootMovies;
+import com.charlyge.android.depopularmovies.model.RootReview;
+import com.charlyge.android.depopularmovies.model.RootTrailers;
+import com.charlyge.android.depopularmovies.model.Trailers;
 
 import java.util.List;
 
@@ -55,5 +59,37 @@ public class NetworkService {
             }
         });
    return  mutableLiveData;
+    }
+
+    public LiveData<List<Review>> getReviews(String id,String api_key){
+        final MutableLiveData<List<Review>> mutableLiveData = new MutableLiveData<>();
+        jsonPlaceHolder.reviewlist(id,api_key).enqueue(new Callback<RootReview>() {
+            @Override
+            public void onResponse(Call<RootReview> call, Response<RootReview> response) {
+                mutableLiveData.setValue(response.body().getReviewArrayList());
+            }
+
+            @Override
+            public void onFailure(Call<RootReview> call, Throwable t) {
+            mutableLiveData.setValue(null);
+            }
+        });
+        return mutableLiveData;
+    }
+
+    public LiveData<List<Trailers>> getTrailers(String id,String api_key){
+        final MutableLiveData<List<Trailers>> mutableLiveData = new MutableLiveData<>();
+        jsonPlaceHolder.trailerlist(id,api_key).enqueue(new Callback<RootTrailers>() {
+            @Override
+            public void onResponse(Call<RootTrailers> call, Response<RootTrailers> response) {
+                mutableLiveData.setValue(response.body().getTrailersArrayList());
+            }
+
+            @Override
+            public void onFailure(Call<RootTrailers> call, Throwable t) {
+            mutableLiveData.setValue(null);
+            }
+        });
+        return mutableLiveData;
     }
 }

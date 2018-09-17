@@ -1,4 +1,4 @@
-package com.charlyge.android.depopularmovies;
+package com.charlyge.android.depopularmovies.ViewModels;
 
 import android.app.Application;
 import android.arch.lifecycle.AndroidViewModel;

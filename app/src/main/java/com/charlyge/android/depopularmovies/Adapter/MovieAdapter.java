@@ -39,7 +39,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
     }
 
     public interface itemClickListener{
-        void onItemClicked(String id, String title, String release_date,String overview,String vote_average,String poster_path,String db_poster_path);
+        void onItemClicked(String id, String title, String release_date,String overview,String vote_average,String poster_path,String db_poster_path,String backDropImage, String db_backDropImage);
     }
 
     @NonNull
@@ -116,8 +116,10 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
             final String vote_Average = movies.getVote_average();
             //poster path to insert in room Database
             final String db_Poster_Path = movies.getPoster_path();
+            final String db_backDropImage = movies.getBackdrop_path();
+            final String backDropImage =  "http://image.tmdb.org/t/p/w342/" + movies.getBackdrop_path();
             final String poster_path = "http://image.tmdb.org/t/p/w342/"+movies.getPoster_path();
-           newItemClickListener.onItemClicked(id,title,release_date,overView,vote_Average,poster_path,db_Poster_Path);
+           newItemClickListener.onItemClicked(id,title,release_date,overView,vote_Average,poster_path,db_Poster_Path,backDropImage,db_backDropImage);
 
         }
     }
