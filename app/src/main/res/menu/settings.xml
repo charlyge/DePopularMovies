@@ -11,7 +11,13 @@
         android:id="@+id/action_fav"
         android:orderInCategory="100"
         app:showAsAction="never"
-        android:title="My Favorites"
+        android:title="@string/my_favorites"
         />
-
+    <item
+        android:id="@+id/action_referesh"
+        android:orderInCategory="100"
+        app:showAsAction="always"
+        android:title="@string/refresh"
+        android:icon="@drawable/ic_refresh_black_24dp"
+        />
 </menu>

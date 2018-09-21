@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
+
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/main_content"
     android:orientation="horizontal">
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main_content"
-    android:layout_width="400dp"
+    android:layout_width="300dp"
     android:layout_height="match_parent"
     android:orientation="vertical"
     tools:context="com.charlyge.android.depopularmovies.MainActivity">
@@ -36,21 +38,23 @@
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"/>
 </RelativeLayout>
+
     <!-- Layout for the Details Activity-->
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView
+    android:layout_height="match_parent"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    >
     <LinearLayout
         android:id="@+id/Details_activity"
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
         <FrameLayout
-            android:id="@+id/movie_details_container"
-            android:layout_height="wrap_content"
+            android:id="@+id/movie_details_containerr"
+            android:layout_height="match_parent"
             android:layout_width="match_parent"
             />
     </LinearLayout>
 </ScrollView>
 </LinearLayout>
+

@@ -13,4 +13,7 @@
     <string name="play">Play</string>
     <string name="movie_trailer">Movie Trailer</string>
     <string name="reviews">Reviews</string>
+    <string name="refresh">Refresh</string>
+    <string name="my_favorites">My Favorites</string>
+    <string name="plot_synopsis">Plot Synopsis</string>
 </resources>

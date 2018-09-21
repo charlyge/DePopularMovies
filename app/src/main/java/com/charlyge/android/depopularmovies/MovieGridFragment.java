@@ -25,7 +25,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.charlyge.android.depopularmovies.Adapter.MovieAdapter;
 import com.charlyge.android.depopularmovies.Database.AppDatabase;
@@ -52,18 +51,18 @@ import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_VOTE_AVE
 
 public class MovieGridFragment extends Fragment implements
         SharedPreferences.OnSharedPreferenceChangeListener, MovieAdapter.itemClickListener {
-    boolean mTwoPane;
+    private boolean mTwoPane;
     private RecyclerView recyclerView;
     private MovieAdapter movieAdapter;
-    AppDatabase appDatabase;
+    private AppDatabase appDatabase;
     private TextView errorTextView;
     private ProgressBar progressBar;
     private int screenRotateOnFavselected=0;
     private boolean PREFERENCE_UPDATED = false;
-    SharedPreferences sharedPreferences;
+    private SharedPreferences sharedPreferences;
     private List<Movies> moviesList;
-    DatabaseViewModel databaseViewModel;
-    MoviesViewModel moviesViewModel;
+    private DatabaseViewModel databaseViewModel;
+    private MoviesViewModel moviesViewModel;
 
     private static final String SCREEN_ROTATE_KEY = "Screenkey";
 
@@ -106,6 +105,9 @@ public class MovieGridFragment extends Fragment implements
 
 
         }
+        if(id == R.id.action_referesh){
+            getActivity().recreate();
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -125,6 +127,9 @@ public class MovieGridFragment extends Fragment implements
 
             screenRotateOnFavselected = savedInstanceState.getInt(SCREEN_ROTATE_KEY);
         }
+
+
+
         recyclerView = rootView.findViewById(R.id.recycler_view);
         errorTextView = rootView.findViewById(R.id.error_view);
         progressBar = rootView.findViewById(R.id.loading_indicator);
@@ -246,7 +251,7 @@ public class MovieGridFragment extends Fragment implements
             movieDetailFragment.setDbPoster_path(db_poster_path);
             movieDetailFragment.setDbBackdrop_Image(db_backDropImage);
             movieDetailFragment.setBackdrop_Image(backDropImage);
-            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.movie_details_container,movieDetailFragment).commit();
+            getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.movie_details_containerr,movieDetailFragment).commit();
 
         } else {
             Intent intent = new Intent(getActivity(), MovieDetailActivity.class);

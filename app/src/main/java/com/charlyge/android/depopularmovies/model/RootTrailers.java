@@ -6,7 +6,7 @@ import java.util.ArrayList;
 
 public class RootTrailers {
     @SerializedName("results")
-    ArrayList<Trailers> trailersArrayList= null;
+   private ArrayList<Trailers> trailersArrayList= null;
 
     public void setTrailersArrayList(ArrayList<Trailers> trailersArrayList) {
         this.trailersArrayList = trailersArrayList;

@@ -16,7 +16,7 @@ import java.util.List;
 
 public class MoviesViewModel extends AndroidViewModel {
 
-public LiveData<List<Movies>> listLiveData;
+private LiveData<List<Movies>> listLiveData;
     public MoviesViewModel(@NonNull Application application) {
         super(application);
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getApplication());

@@ -1,7 +1,6 @@
 package com.charlyge.android.depopularmovies.Adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -14,10 +13,10 @@ import android.widget.PopupMenu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.charlyge.android.depopularmovies.MovieDetailActivity;
+
 import com.charlyge.android.depopularmovies.R;
 import com.charlyge.android.depopularmovies.model.Movies;
-import com.charlyge.android.depopularmovies.model.RootMovies;
+
 import com.squareup.picasso.Picasso;
 
 import java.util.List;
@@ -29,7 +28,7 @@ import java.util.List;
 
 public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder> {
     private Context mContext;
-    public List<Movies> moviesList;
+    private List<Movies> moviesList;
     private itemClickListener newItemClickListener;
 
     public MovieAdapter(Context mContext, List<Movies> moviesList,itemClickListener newItemClickListener) {
@@ -97,7 +96,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
      TextView textView_release_date;
 
 
-        public MyViewHolder(View itemView) {
+        MyViewHolder(View itemView) {
             super(itemView);
             imageView_thumb = itemView.findViewById(R.id.thumbnail);
             textView_release_date = itemView.findViewById(R.id.release_date);
@@ -125,7 +124,7 @@ public class MovieAdapter extends RecyclerView.Adapter<MovieAdapter.MyViewHolder
     }
 
     private class MyMenuItemClickListener implements PopupMenu.OnMenuItemClickListener {
-        public MyMenuItemClickListener(){
+        MyMenuItemClickListener(){
 
         }
 

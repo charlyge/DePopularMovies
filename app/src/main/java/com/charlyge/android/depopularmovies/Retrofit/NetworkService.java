@@ -2,8 +2,6 @@ package com.charlyge.android.depopularmovies.Retrofit;
 
 import android.arch.lifecycle.LiveData;
 import android.arch.lifecycle.MutableLiveData;
-import android.util.Log;
-import android.view.View;
 
 import com.charlyge.android.depopularmovies.model.Movies;
 import com.charlyge.android.depopularmovies.model.Review;
@@ -31,7 +29,7 @@ public class NetworkService {
     private JSONPlaceHolder jsonPlaceHolder;
     private static NetworkService networkService;
 
-    public NetworkService() {
+    private NetworkService() {
         Retrofit retrofit = new Retrofit.Builder().baseUrl("https://api.themoviedb.org/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();

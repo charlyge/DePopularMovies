@@ -13,12 +13,13 @@ import android.widget.VideoView;
 
 import com.charlyge.android.depopularmovies.R;
 import com.charlyge.android.depopularmovies.model.Trailers;
+import com.squareup.picasso.Picasso;
 
 import java.util.List;
 
 public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerViewHolder> {
-     List<Trailers> trailersList;
-     public  TrailerItemClckListener trailerItemClckListener;
+     private List<Trailers> trailersList;
+     private TrailerItemClckListener trailerItemClckListener;
 
      public TrailerAdapter(TrailerItemClckListener trailerItemClckListener){
          this.trailerItemClckListener =trailerItemClckListener;
@@ -47,6 +48,7 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
     public void onBindViewHolder(@NonNull TrailerViewHolder holder, int position) {
      Trailers trailers = trailersList.get(position);
      holder.trailerTitle.setText(trailers.getName());
+        Picasso.get().load("http://img.youtube.com/vi/" + trailers.getKey() + "/3.jpg" ).into(holder.imageView);
 
     }
 
@@ -66,10 +68,10 @@ public class TrailerAdapter extends RecyclerView.Adapter<TrailerAdapter.TrailerV
     public class TrailerViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
       ImageView imageView;
       TextView trailerTitle;
-        public TrailerViewHolder(View itemView) {
+        TrailerViewHolder(View itemView) {
             super(itemView);
-            imageView= (ImageView)itemView.findViewById(R.id.TrailerView);
-            trailerTitle= (TextView)itemView.findViewById(R.id.TrailerTitle);
+            imageView= itemView.findViewById(R.id.TrailerView);
+            trailerTitle= itemView.findViewById(R.id.TrailerTitle);
             itemView.setOnClickListener(this);
         }
 

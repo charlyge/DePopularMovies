@@ -6,18 +6,16 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.charlyge.android.depopularmovies.R;
 import com.charlyge.android.depopularmovies.model.Review;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdapterViewHolder>{
 
-    List<Review> reviewArrayList;
+   private List<Review> reviewArrayList;
 
        public ReviewAdapter( List<Review> reviewArrayList){
    this.reviewArrayList = reviewArrayList;
@@ -54,10 +52,10 @@ public class ReviewAdapter extends RecyclerView.Adapter<ReviewAdapter.ReviewAdap
         TextView reviewContentTv;
         TextView authorTv;
 
-        public ReviewAdapterViewHolder(View itemView) {
+        ReviewAdapterViewHolder(View itemView) {
             super(itemView);
-            reviewContentTv = (TextView)itemView.findViewById(R.id.reviewContent_tv);
-            authorTv = (TextView)itemView.findViewById(R.id.reviewAuthor_tv);
+            reviewContentTv = itemView.findViewById(R.id.reviewContent_tv);
+            authorTv = itemView.findViewById(R.id.reviewAuthor_tv);
         }
     }
 

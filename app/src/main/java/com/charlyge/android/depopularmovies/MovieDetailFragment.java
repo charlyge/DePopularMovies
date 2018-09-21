@@ -1,19 +1,16 @@
 package com.charlyge.android.depopularmovies;
 
 import android.arch.lifecycle.Observer;
-import android.arch.lifecycle.ViewModelProviders;
 import android.content.Intent;
+import android.media.Image;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -27,10 +24,6 @@ import com.charlyge.android.depopularmovies.Adapter.TrailerAdapter;
 import com.charlyge.android.depopularmovies.Data.Constants;
 import com.charlyge.android.depopularmovies.Database.AppDatabase;
 import com.charlyge.android.depopularmovies.Retrofit.NetworkService;
-import com.charlyge.android.depopularmovies.ViewModels.ReviewViewModel;
-import com.charlyge.android.depopularmovies.ViewModels.ReviewViewModelFactory;
-import com.charlyge.android.depopularmovies.ViewModels.TrailerViewModel;
-import com.charlyge.android.depopularmovies.ViewModels.TrailerViewModelFactory;
 import com.charlyge.android.depopularmovies.model.Movies;
 import com.charlyge.android.depopularmovies.model.Review;
 import com.charlyge.android.depopularmovies.model.Trailers;
@@ -101,18 +94,12 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
       appDatabase = AppDatabase.getAppDatabaseInstance(getActivity());
       NetworkService networkService = NetworkService.getOurInstance();
 
-
-        Toolbar toolbar = (Toolbar) root.findViewById(R.id.toolbar);
-        ((AppCompatActivity)getActivity()).setSupportActionBar(toolbar);
-
-        CollapsingToolbarLayout collapsingToolbarLayout = (CollapsingToolbarLayout) root.findViewById(R.id.collapsing_toolbar);
-        collapsingToolbarLayout.setTitle(title);
        TextView overviewTv = root.findViewById(R.id.overview);
 
 
 
         TextView titleTv = root.findViewById(R.id.detail_title);
-        final ImageView addToFav = (ImageView)root.findViewById(R.id.add_to_fav);
+        final ImageView addToFav = root.findViewById(R.id.add_to_fav);
         AppExecutor.getInstance().getDiskIo().execute(new Runnable() {
             @Override
             public void run() {
@@ -140,8 +127,7 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
         TextView  release_date_Tv = root.findViewById(R.id.release_date_details);
         ImageView poster_path_Iv = root.findViewById(R.id.poster_path_details);
         TextView user_rating_Tv = root.findViewById(R.id.user_rating);
-       // ImageView backDropImageView = root.findViewById(R.id.backDropImage);
-       // Picasso.get().load(backDropImage).placeholder(getResources().getDrawable(R.drawable.ic_launcher_background)).into(backDropImageView);
+
         addToFav.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -195,19 +181,17 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
         reviewRv.setLayoutManager(linearLayoutManagerRv);
         reviewRv.setHasFixedSize(true);
         ((DefaultItemAnimator) reviewRv.getItemAnimator()).setSupportsChangeAnimations(false);
-        reviewRv.setNestedScrollingEnabled(false);
 
-        ReviewViewModelFactory reviewViewModelFactory = new ReviewViewModelFactory(networkService,idMovies, Constants.API_KEY);
-        ReviewViewModel reviewViewModel = ViewModelProviders.of(getActivity(),reviewViewModelFactory)
-                .get(ReviewViewModel.class);
-        reviewViewModel.getListLiveData().observe(getActivity(), new Observer<List<Review>>() {
-            @Override
-            public void onChanged(@Nullable List<Review> reviews) {
-                Log.i("Review","Started Review call");
-                final ReviewAdapter reviewAdapter = new ReviewAdapter(reviews);
-                reviewRv.setAdapter(reviewAdapter);
-            }
-        });
+       networkService.getReviews(idMovies,Constants.API_KEY).observe(getActivity(), new Observer<List<Review>>() {
+           @Override
+           public void onChanged(@Nullable List<Review> reviews) {
+               Log.i("Review","Started Review call");
+               final ReviewAdapter reviewAdapter = new ReviewAdapter(reviews);
+               reviewRv.setAdapter(reviewAdapter);
+           }
+       });
+
+
 
         //NetworkConnection for Trailers
         //Setup RecyclerView For Trailer
@@ -215,21 +199,19 @@ public class MovieDetailFragment extends Fragment implements TrailerAdapter.Trai
 
         LinearLayoutManager linearLayoutManagerTr = new LinearLayoutManager(getActivity(),LinearLayoutManager.VERTICAL,false);
         trailerRv.setLayoutManager(linearLayoutManagerTr);
-        trailerRv.setNestedScrollingEnabled(false);
         trailerRv.setHasFixedSize(true);
         ((DefaultItemAnimator) trailerRv.getItemAnimator()).setSupportsChangeAnimations(false);
         final TrailerAdapter trailerAdapter = new TrailerAdapter(this);
         trailerRv.setAdapter(trailerAdapter);
-        TrailerViewModelFactory trailerViewModelFactory = new TrailerViewModelFactory(networkService,idMovies,Constants.API_KEY);
-        TrailerViewModel trailerViewModel = ViewModelProviders.of(getActivity(),trailerViewModelFactory).get(TrailerViewModel.class);
-        trailerViewModel.getTrailersList().observe(getActivity(), new Observer<List<Trailers>>() {
+        networkService.getTrailers(idMovies,Constants.API_KEY).observe(getActivity(), new Observer<List<Trailers>>() {
             @Override
             public void onChanged(@Nullable List<Trailers> trailers) {
                 Log.i("Trailer","Started Trailer call");
-              trailerAdapter.setTrailersList(trailers);
-
+                trailerAdapter.setTrailersList(trailers);
             }
         });
+
+
 
         return root;
     }

@@ -1,8 +1,13 @@
 package com.charlyge.android.depopularmovies;
 
 import android.content.Intent;
+import android.support.design.widget.CollapsingToolbarLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
+import android.widget.ImageView;
+
+import com.squareup.picasso.Picasso;
 
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_BACKDROP_IMAGE;
 import static com.charlyge.android.depopularmovies.Data.Constants.EXTRA_DBBACKDROP_IMAGE;
@@ -23,7 +28,8 @@ public class MovieDetailActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_detail);
-
+        Toolbar toolbar =  findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
         if(savedInstanceState!=null){
       movieDetailFragment =(MovieDetailFragment)getSupportFragmentManager().findFragmentByTag(FRAGMENT_TAG);
         }
@@ -59,6 +65,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         if(intent.hasExtra(EXTRA_BACKDROP_IMAGE)){
             String backDropImage = intent.getStringExtra(EXTRA_BACKDROP_IMAGE);
             movieDetailFragment.setBackdrop_Image(backDropImage);
+            ImageView backDropImageView = findViewById(R.id.backDropImage);
+            Picasso.get().load(backDropImage).into(backDropImageView);
 
         }
 
@@ -72,6 +80,8 @@ public class MovieDetailActivity extends AppCompatActivity {
         if(intent.hasExtra(EXTRA_TITLEE)){
             String title = intent.getStringExtra(EXTRA_TITLEE);
             movieDetailFragment.setTitle(title);
+            CollapsingToolbarLayout collapsingToolbarLayout = findViewById(R.id.toolbar_layout);
+            collapsingToolbarLayout.setTitle(title);
 
         }
         if(intent.hasExtra(EXTRA_RELEASE_DATE)){
@@ -85,7 +95,7 @@ public class MovieDetailActivity extends AppCompatActivity {
 
         }
         if(!movieDetailFragment.isInLayout()){
-            getSupportFragmentManager().beginTransaction().replace(R.id.movie_details_container,movieDetailFragment,FRAGMENT_TAG).
+            getSupportFragmentManager().beginTransaction().replace(R.id.movie_details_containerr,movieDetailFragment,FRAGMENT_TAG).
                     commit();
         }
 

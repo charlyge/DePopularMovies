@@ -11,7 +11,7 @@ import java.util.ArrayList;
 
 public class RootMovies {
     @SerializedName("results") @Expose
-    ArrayList<Movies> moviesArrayList = null;
+   private ArrayList<Movies> moviesArrayList = null;
 
     public void setMoviesArrayList(ArrayList<Movies> moviesArrayList) {
         this.moviesArrayList = moviesArrayList;
